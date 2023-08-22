@@ -1,14 +1,16 @@
 package example.Advanced.Music.app.services;
 
-import example.Advanced.Music.app.entities.Users;
+import example.Advanced.Music.app.entities.User;
 
 import java.util.Optional;
 
 public interface UserService {
-    Optional<Users> findByUserName(String userName);
+    Optional<User> findByUserName(String userName);
     boolean existsByUserName(String UserName);
-    Users saveOrUpdate(Users user);
+    User saveOrUpdate(User user);
     Long count();
 
     String unlockUser(String username);
+
+
 }

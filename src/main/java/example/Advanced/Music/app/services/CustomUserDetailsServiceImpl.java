@@ -1,6 +1,6 @@
 package example.Advanced.Music.app.services;
 
-import example.Advanced.Music.app.entities.Users;
+import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.models.CustomUserDetails;
 import example.Advanced.Music.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,9 +21,9 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Users> optionalUsers = userRepository.findByUsername(username);
+        Optional<User> optionalUsers = userRepository.findByUsername(username);
         if(optionalUsers.isPresent()){
-            Users user = optionalUsers.get();
+            User user = optionalUsers.get();
             List<GrantedAuthority> authorityList = user.getListRoles().stream()
                     .map(roles -> new SimpleGrantedAuthority(roles.getRoleName().name()))
                     .collect(Collectors.toList());

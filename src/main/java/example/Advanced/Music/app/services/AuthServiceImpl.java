@@ -5,7 +5,7 @@ import example.Advanced.Music.app.dto.*;
 import example.Advanced.Music.app.entities.OTP;
 import example.Advanced.Music.app.entities.Roles;
 import example.Advanced.Music.app.entities.Token;
-import example.Advanced.Music.app.entities.Users;
+import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.enums.ErrorEnum;
 import example.Advanced.Music.app.enums.OTPType;
 import example.Advanced.Music.app.enums.RoleEnum;
@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public String register(RegisterRequestDto requestDto) throws Exception {
         try{
-            Users newUser = new Users();
+            User newUser = new User();
             PropertyUtils.copyProperties(newUser, requestDto);
             newUser.setPassword(passwordEncoder.encode(requestDto.getPassword()));
             Roles userRole = roleRepository.findByRoleName(RoleEnum.ROLE_USER).orElseThrow(()->new RuntimeException("Error: role not found"));
@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService{
             listRole.add(userRole);
             newUser.setListRoles(listRole);
             newUser.setIsLock(true);
-            Users user = userRepository.save(newUser);
+            User user = userRepository.save(newUser);
 
             String sendText = MaskingUtil.Randomization.randomizeStringNumber(6);
             OTP otp = new OTP();
@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public UserDto acceptRegister(String username, String opt) throws Exception {
         try {
-            Optional<Users> oUser = userRepository.findByUsername(username);
+            Optional<User> oUser = userRepository.findByUsername(username);
             if(!oUser.isPresent()){
                 throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
             }
@@ -145,7 +145,7 @@ public class AuthServiceImpl implements AuthService{
             userRepository.loginSuccess(username);
             return ret;
         } catch (Exception e) {
-            Optional<Users> oUser = userRepository.findByUsername(username);
+            Optional<User> oUser = userRepository.findByUsername(username);
             if (oUser.get().getIsLock()) {
                 throw new ACTException(ErrorEnum.USER_HAS_BEEN_LOCKED, ErrorEnum.USER_HAS_BEEN_LOCKED.getMessageId());
             }
@@ -187,8 +187,8 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public CurrentUserResponseDto currentUserInfo() {
         CustomUserDetails authUser = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Users> oUser = userRepository.findById(authUser.getId());
-        Users user = oUser.get();
+        Optional<User> oUser = userRepository.findById(authUser.getId());
+        User user = oUser.get();
         CurrentUserResponseDto ret = new CurrentUserResponseDto();
         ret.setId(user.getId());
         ret.setUsername(user.getUsername());
@@ -207,7 +207,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public String changePassword(ChangePasswordRequestDto requestDto) throws Exception {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Users> oUser = userRepository.findById(userDetails.getId());
+        Optional<User> oUser = userRepository.findById(userDetails.getId());
         if(!oUser.isPresent()){
             throw  new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
         } else {
@@ -223,11 +223,11 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public ForgetPasswordSuccessResponseDto forgetPassword(ForgetPasswordRequestDto requestDto) throws Exception {
-        Optional<Users> oUser = userRepository.findByUsernameAndEmail(requestDto.getName(),requestDto.getEmail());
+        Optional<User> oUser = userRepository.findByUsernameAndEmail(requestDto.getName(),requestDto.getEmail());
         if (!oUser.isPresent()){
             throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
         } else {
-            Users user = oUser.get();
+            User user = oUser.get();
             CustomUserDetails customUserDetails = new CustomUserDetails(user.getId(), user.getUsername(),
                     user.getPassword(), user.getDisplayName(), user.getIsLock());
             Date now = new Date();
@@ -245,7 +245,7 @@ public class AuthServiceImpl implements AuthService{
         String userIdStr = jwtService.getUserIdOnResetToken(resetPasswordToken);
         long userId = Long.parseLong(userIdStr);
         if (tokenService.isTokenValid(userId, resetPasswordToken)){
-            Optional<Users> oUser = userRepository.findById(userId);
+            Optional<User> oUser = userRepository.findById(userId);
             if (!oUser.isPresent()){
                 throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
             } else {

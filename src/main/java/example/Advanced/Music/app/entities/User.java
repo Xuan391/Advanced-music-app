@@ -10,8 +10,6 @@ import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import javax.validation.constraints.*;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }) }) // ràng buộc cột username là duy nhất
-public class Users extends EntityBase{
+public class User extends EntityBase{
     private static final long serialVersionUID = 1L;
 
     @NotNull
@@ -77,6 +75,9 @@ public class Users extends EntityBase{
     @Max(Constants.FAIL_LOGIN_COUNT_MAX)
     @Column(name = "fail_login_count", nullable = false)
     private Integer failLoginCount;
+
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private Set<Playlist>
 
 //    @PrePersist
 //    public void addDefaultPlaylist() {

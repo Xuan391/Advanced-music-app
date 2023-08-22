@@ -1,7 +1,6 @@
 package example.Advanced.Music.app.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import example.Advanced.Music.app.constans.Constants;
 import example.Advanced.Music.app.enums.TokenTypeEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -48,7 +47,7 @@ public class Token extends EntityBase {
 
 	@JsonIgnore
 	@ManyToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST,
-			CascadeType.REFRESH }, targetEntity = Users.class, fetch = FetchType.LAZY)
+			CascadeType.REFRESH }, targetEntity = User.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", insertable = false, updatable = false, referencedColumnName = "id")
-	private Users user;
+	private User user;
 }

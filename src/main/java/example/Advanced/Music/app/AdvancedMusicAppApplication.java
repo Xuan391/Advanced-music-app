@@ -1,10 +1,8 @@
 package example.Advanced.Music.app;
 
 import example.Advanced.Music.app.entities.Roles;
-import example.Advanced.Music.app.entities.Users;
+import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.enums.RoleEnum;
-import example.Advanced.Music.app.repositories.RoleRepository;
-import example.Advanced.Music.app.repositories.UserRepository;
 import example.Advanced.Music.app.services.RoleService;
 import example.Advanced.Music.app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,7 @@ public class AdvancedMusicAppApplication implements CommandLineRunner {
 				e.printStackTrace();
 			}
 
-			Users user = new Users();
+			User user = new User();
 			user.setUsername(username);
 			user.setPassword(passwordEncoder.encode(pwd.trim()));
 			user.setDisplayName(displayName);

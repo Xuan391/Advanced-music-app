@@ -1,6 +1,6 @@
 package example.Advanced.Music.app.services;
 
-import example.Advanced.Music.app.entities.Users;
+import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
     @Override
-    public Optional<Users> findByUserName(String userName) {
+    public Optional<User> findByUserName(String userName) {
         return userRepository.findByUsername(userName);
     }
 
@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Users saveOrUpdate(Users user) {
+    public User saveOrUpdate(User user) {
         return userRepository.save(user);
     }
 
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public String unlockUser(String username) {
-        Users user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Not found username:" + username));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Not found username:" + username));
         userRepository.unLockUser(user.getUsername());
         return user.getUsername()+": unlocked";
     }

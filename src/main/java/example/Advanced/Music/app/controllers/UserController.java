@@ -24,5 +24,14 @@ public class UserController {
         return RequestUtil.ok(userService.unlockUser(username));
     }
 
+    @ApiOperation("API admin tạo tài khoản")
+    @PostMapping("/create-account")
+    @ResponseBody
+    @PreAuthorize("hasAnyAuthority('" + Constants.Role.ROLE_ADMIN + "')")
+    public SuccessResponse<Object> createAccount(
+            @RequestParam (value = "username") String username ) throws Exception{
+        return RequestUtil.ok(userService.unlockUser(username));
+    }
+
 
 }
