@@ -3,7 +3,7 @@ package example.Advanced.Music.app.services;
 import example.Advanced.Music.app.Util.MaskingUtil;
 import example.Advanced.Music.app.dto.*;
 import example.Advanced.Music.app.entities.OTP;
-import example.Advanced.Music.app.entities.Roles;
+import example.Advanced.Music.app.entities.Role;
 import example.Advanced.Music.app.entities.Token;
 import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.enums.ErrorEnum;
@@ -33,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.*;
 
 @Service
@@ -63,13 +64,13 @@ public class AuthServiceImpl implements AuthService{
     private long jwtExpirationResetPwd;
 
     @Override
-    public String register(RegisterRequestDto requestDto) throws Exception {
+    public String register(@Valid RegisterRequestDto requestDto) throws Exception {
         try{
             User newUser = new User();
             PropertyUtils.copyProperties(newUser, requestDto);
             newUser.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-            Roles userRole = roleRepository.findByRoleName(RoleEnum.ROLE_USER).orElseThrow(()->new RuntimeException("Error: role not found"));
-            Set<Roles> listRole = new HashSet<>();
+            Role userRole = roleRepository.findByRoleName(RoleEnum.ROLE_USER).orElseThrow(()->new RuntimeException("Error: role not found"));
+            Set<Role> listRole = new HashSet<>();
             listRole.add(userRole);
             newUser.setListRoles(listRole);
             newUser.setIsLock(true);

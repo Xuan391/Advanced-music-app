@@ -1,5 +1,6 @@
 package example.Advanced.Music.app.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import example.Advanced.Music.app.constans.Constants;
 import jakarta.persistence.*;
@@ -31,10 +32,11 @@ public class Playlist extends EntityBase {
     @Column(name = "playlist_name", length = Constants.NAME_MAX_LENGTH)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "created_id")
     @JsonIdentityReference(alwaysAsId = true)
-    private User user;
+    @JsonBackReference
+    private User creator;
 
     @Column(name = "is_favorite")
     private boolean isFavorite;

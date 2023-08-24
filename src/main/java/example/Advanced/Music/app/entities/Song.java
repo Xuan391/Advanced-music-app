@@ -1,6 +1,7 @@
 package example.Advanced.Music.app.entities;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import example.Advanced.Music.app.constans.Constants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -58,7 +59,10 @@ public class Song extends EntityBase{
     @Column(name = "listened_count")
     private int listenedCount;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "song", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<ListenedHistory> listenedHistories;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "song", cascade = CascadeType.REMOVE)
+    private Set<PlaylistSong> playlistSongs = new HashSet<>();
 }

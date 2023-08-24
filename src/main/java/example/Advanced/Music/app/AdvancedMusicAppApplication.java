@@ -1,6 +1,6 @@
 package example.Advanced.Music.app;
 
-import example.Advanced.Music.app.entities.Roles;
+import example.Advanced.Music.app.entities.Role;
 import example.Advanced.Music.app.entities.User;
 import example.Advanced.Music.app.enums.RoleEnum;
 import example.Advanced.Music.app.services.RoleService;
@@ -44,9 +44,9 @@ public class AdvancedMusicAppApplication implements CommandLineRunner {
 		long count = userService.count();
 		if(count == 0){
 			try{
-				List<Roles> roles = new ArrayList<>();
+				List<Role> roles = new ArrayList<>();
 				for(RoleEnum r: RoleEnum.values()){
-					Roles role = new Roles();
+					Role role = new Role();
 					role.setRoleName(r);
 					roles.add(role);
 				}
@@ -61,9 +61,9 @@ public class AdvancedMusicAppApplication implements CommandLineRunner {
 			user.setEmail(email);
 			user.setFirstName(firstName);
 			user.setLastName(lastName);
-			Set<Roles> listRoles = new HashSet<>();
-			List<Roles> roles = roleService.findAll();
-			for(Roles role : roles){
+			Set<Role> listRoles = new HashSet<>();
+			List<Role> roles = roleService.findAll();
+			for(Role role : roles){
 				listRoles.add(role);
 			}
 			user.setListRoles(listRoles);

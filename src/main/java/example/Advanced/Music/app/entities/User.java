@@ -8,9 +8,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.validation.constraints.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -64,33 +70,47 @@ public class User extends EntityBase{
     @Email
     private String email;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY/*, cascade = CascadeType.REMOVE*/)
     @JoinTable(
             name = "user_role",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")})
-    private Set<Roles> listRoles = new HashSet<>();
+    private Set<Role> listRoles = new HashSet<>();
 
     @Min(Constants.FAIL_LOGIN_COUNT_MIN)
     @Max(Constants.FAIL_LOGIN_COUNT_MAX)
     @Column(name = "fail_login_count", nullable = false)
     private Integer failLoginCount;
 
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-//    private Set<Playlist>
+    @OneToMany(mappedBy = "creator", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Playlist> playlists = new ArrayList<>();
 
-//    @PrePersist
-//    public void addDefaultPlaylist() {
-//        Playlist playlist = new Playlist();
-//        playlist.setName("Yêu thích");
-//        playlist.setCreator(this);
-//        playlist.setFavorite(true);
-//        playlist.setCreatedAt(LocalDateTime.now());
-//        this.playlists.add(playlist);
-//    }
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<ListenedHistory> listenedHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<SearchHistory> searchHistories = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinTable(
+            name = "user_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers = new HashSet<>();
+
+    @Transient
+    private int followersCount;
 
     @PrePersist
     public void preInsert() {
+        Playlist playlist = new Playlist();
+        playlist.setName("Yêu thích");
+        playlist.setCreator(this);
+        playlist.setFavorite(true);
+        playlist.setCreatedDate(Instant.now());
+        this.playlists.add(playlist);
+
         this.displayName = this.firstName.trim() + " " + this.lastName.trim();
         this.failLoginCount = 0;
         if (isLock == null) {
