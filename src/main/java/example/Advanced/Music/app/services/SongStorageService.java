@@ -27,9 +27,9 @@ public class SongStorageService implements IStorageService {
     private SseEmitter uploadProgressEmitter;
 
 
-    public SseEmitter getUploadProgressEmitter() {
-        return uploadProgressEmitter;
-    }
+//    public SseEmitter getUploadProgressEmitter() {
+//        return uploadProgressEmitter;
+//    }
 
 
     public SongStorageService() {
@@ -131,7 +131,34 @@ public class SongStorageService implements IStorageService {
     }
 
     @Override
+    public void deleteFileByName(String fileName) {
+        try {
+            Path filePath = storageFolder.resolve(fileName);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            } else {
+                throw new RuntimeException("File not found: " + fileName);
+            }
+        } catch (IOException exception) {
+            throw new RuntimeException("Failed to delete file: " + fileName, exception);
+        }
+    }
+
+    @Override
     public void deleteAllFiles() {
+        try {
+            Files.walk(storageFolder)
+                    .filter(path -> !path.equals(storageFolder))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Failed to delete file: " + path.getFileName(), e);
+                        }
+                    });
+        } catch (IOException exception) {
+            throw new RuntimeException("Failed to delete files", exception);
+        }
 
     }
 }

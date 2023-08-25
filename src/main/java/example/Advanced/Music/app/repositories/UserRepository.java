@@ -3,6 +3,7 @@ package example.Advanced.Music.app.repositories;
 import example.Advanced.Music.app.entities.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,8 +14,8 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findByIdIn(List<String> ids);
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+    List<User> findByIdIn(List<Long> ids);
 
     Optional<User> findByUsername(String username);
 

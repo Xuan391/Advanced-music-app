@@ -10,5 +10,4 @@ public class SearchUserRequest {
 	private String username;
 	private String name;
 	private String email;
-	private String phoneNumber;
 }

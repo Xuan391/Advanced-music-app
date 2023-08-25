@@ -198,6 +198,7 @@ public class AuthServiceImpl implements AuthService{
         ret.setLastName(user.getLastName());
         ret.setEmail(user.getEmail());
         ret.setAvatar_url(user.getAvatarUrl());
+        ret.setFollowerSize(user.getFollowersCount());
         List<String> roles = new ArrayList<>();
         SecurityContextHolder.getContext().getAuthentication().getAuthorities()
                         .forEach(auth -> roles.add(auth.toString()));

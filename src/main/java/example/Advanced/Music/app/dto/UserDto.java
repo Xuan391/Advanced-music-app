@@ -23,6 +23,7 @@ public class UserDto {
 	private String lastName;
 	private String email;
 	private String avatarUrl;
+	private int followersSize;
 	private Boolean isLock;
 	private List<String> roles;
 }

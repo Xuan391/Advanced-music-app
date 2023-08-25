@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 @Service
@@ -56,7 +57,10 @@ public class ImageStorageService implements IStorageService {
             }
 
             String generatedFilename = file.getOriginalFilename();
-            Path destinationFilePath = this.storageFolder.resolve(Paths.get(generatedFilename))
+            String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+            String generatedFileName2 = UUID.randomUUID().toString().replace("-", "");
+            generatedFileName2 = generatedFilename + generatedFileName2+"."+ fileExtension;
+            Path destinationFilePath = this.storageFolder.resolve(Paths.get(generatedFileName2))
                     .normalize().toAbsolutePath();
             if (!destinationFilePath.getParent().equals(this.storageFolder.toAbsolutePath())){
                 //this is a security check
@@ -105,7 +109,34 @@ public class ImageStorageService implements IStorageService {
     }
 
     @Override
+    public void deleteFileByName(String fileName) {
+        try {
+            Path filePath = storageFolder.resolve(fileName);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            } else {
+                throw new RuntimeException("File not found: " + fileName);
+            }
+        } catch (IOException exception) {
+            throw new RuntimeException("Failed to delete file: " + fileName, exception);
+        }
+    }
+
+    @Override
     public void deleteAllFiles() {
+        try {
+            Files.walk(storageFolder)
+                    .filter(path -> !path.equals(storageFolder))
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            throw new RuntimeException("Failed to delete file: " + path.getFileName(), e);
+                        }
+                    });
+        } catch (IOException exception) {
+            throw new RuntimeException("Failed to delete files", exception);
+        }
 
     }
 }

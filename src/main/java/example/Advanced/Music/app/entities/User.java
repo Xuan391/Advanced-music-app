@@ -14,10 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.validation.constraints.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -82,6 +79,9 @@ public class User extends EntityBase{
     @Column(name = "fail_login_count", nullable = false)
     private Integer failLoginCount;
 
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<Song> song;
+
     @OneToMany(mappedBy = "creator", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Playlist> playlists = new ArrayList<>();
 
@@ -91,7 +91,7 @@ public class User extends EntityBase{
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SearchHistory> searchHistories = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_followers",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -99,8 +99,8 @@ public class User extends EntityBase{
     )
     private Set<User> followers = new HashSet<>();
 
-    @Transient
-    private int followersCount;
+    @Column(name = "quantity_follower")
+    private int followersCount = 0;
 
     @PrePersist
     public void preInsert() {

@@ -16,5 +16,6 @@ public class CurrentUserResponseDto {
     private String lastName;
     private String email;
     private String avatar_url;
+    private int followerSize;
     private List<String> roles;
 }

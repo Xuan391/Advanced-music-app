@@ -64,6 +64,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/users/forget-password").requestMatchers("/api/v1/users/forget-password-secret")
                 .requestMatchers("/api/v1/users/reset-password").requestMatchers("/api/v1/users/reset-password-secret")
                 .requestMatchers("/api/v1/users/register").requestMatchers("/api/v1/users/accept-register")
+                .requestMatchers("/api/v1/user/imageFiles/**")
                 .requestMatchers("/api/v1/users/login-secret").requestMatchers("/api/v1/public/**")
                 .requestMatchers("/swagger-ui", "/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs");
     }
