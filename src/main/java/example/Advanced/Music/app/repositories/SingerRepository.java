@@ -6,9 +6,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @Transactional
 public interface SingerRepository extends JpaRepository<Singer, Long>, JpaSpecificationExecutor<Singer> {
-    Singer findByName(String name);
+    @Override
+    Optional<Singer> findById(Long aLong);
+
+    Optional<Singer> findByName(String name);
 
 }

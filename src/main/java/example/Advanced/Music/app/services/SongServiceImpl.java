@@ -125,9 +125,23 @@ public class SongServiceImpl implements SongService{
         String songUrl = MvcUriComponentsBuilder.fromMethodName(SongFileController.class,"readDetailSongFile", songFileName).build().toUri().toString();
         song.setSongUrl(songUrl);
         List<Singer> singers = new ArrayList<>();
-        //đang viết dở
-//        song.setSingers(nameSingers);
-        return null;
+        for(String nameSinger : nameSingers){
+            Optional<Singer> optionalSinger = singerRepository.findByName(nameSinger.trim());
+            if(!optionalSinger.isPresent()){
+                Singer singer = new Singer();
+                singer.setName(nameSinger);
+                singerRepository.save(singer);
+                singers.add(singer);
+            } else {
+                Singer singer = optionalSinger.get();
+                singers.add(singer);
+            }
+        }
+        song.setSingers(singers);
+        songRepository.save(song);
+        SongDto songDto = new SongDto();
+        PropertyUtils.copyProperties(songDto,song);
+        return songDto; // chưa có controller cho service này
     }
 
     @Override
