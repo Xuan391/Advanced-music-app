@@ -1,7 +1,7 @@
 package example.Advanced.Music.app.services;
 
 import example.Advanced.Music.app.Util.SearchUtil;
-import example.Advanced.Music.app.controllers.UserController;
+import example.Advanced.Music.app.controllers.ImageFileController;
 import example.Advanced.Music.app.dto.*;
 import example.Advanced.Music.app.entities.*;
 import example.Advanced.Music.app.enums.ErrorEnum;
@@ -18,8 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -199,7 +197,7 @@ public class UserServiceImpl implements UserService{
         User user = optionalUser.get();
         if(file != null && !file.isEmpty()){
             String imageFile = imageStorageService.storeFile(file);
-            String avatarUrl = MvcUriComponentsBuilder.fromMethodName(UserController.class, "readDetailImageFile",
+            String avatarUrl = MvcUriComponentsBuilder.fromMethodName(ImageFileController.class, "readDetailImageFile",
                     imageFile).build().toUri().toString();
             user.setAvatarUrl(avatarUrl);
         } else {

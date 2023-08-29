@@ -14,9 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -39,7 +37,7 @@ public class Song extends EntityBase{
             joinColumns = {@JoinColumn(name = "singer_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "song_id", referencedColumnName = "id")})
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Set<Singer> singers = new HashSet<>();
+    private List<Singer> singers = new ArrayList<>();
 
     @NotNull
     @Column(name = "song_data_url", nullable = false, unique = true)
@@ -54,10 +52,10 @@ public class Song extends EntityBase{
     private User creator;
 
     @Column(name = "download_count")
-    private int downloadCount;
+    private int downloadCount = 0;
 
     @Column(name = "listened_count")
-    private int listenedCount;
+    private int listenedCount = 0;
 
     @OneToMany(mappedBy = "song", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Collection<ListenedHistory> listenedHistories;

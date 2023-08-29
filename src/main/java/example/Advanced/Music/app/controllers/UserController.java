@@ -31,8 +31,6 @@ import java.util.List;
 public class UserController {
     @Autowired
     public UserService userService;
-    @Autowired
-    public ImageStorageService imageStorageService;
 
     @ApiOperation("API admin unlock tài khoản user")
     @PostMapping("/unlocked-account")
@@ -110,7 +108,7 @@ public class UserController {
     @ApiOperation(value = "Api tìm kiếm nâng cao")
     @PostMapping("/search")
     @ResponseBody
-//    @PreAuthorize("hasAnyAuthority('"+Constants.Role.ROLE_ADMIN+"')")
+    @PreAuthorize("hasAnyAuthority('"+Constants.Role.ROLE_ADMIN+"')")
     public PageResponse<UserDto> advanceSearch(@Valid @RequestBody SearchUserRequest searchRequest,
                                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                                @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
@@ -118,20 +116,6 @@ public class UserController {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<UserDto> pageData = userService.advanceSearch(searchRequest, pageable);
         return new PageResponse<>(pageData);
-    }
-    @ApiOperation(value = "Api đọc ảnh")
-    @GetMapping("/imageFiles/{fileName:.+}")
-    public ResponseEntity<byte[]> readDetailImageFile(@PathVariable String fileName) {
-        try {
-            byte[] bytes = imageStorageService.readFileContent(fileName);
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.IMAGE_JPEG)
-                    .body(bytes);
-
-        }catch (Exception exception){
-            return ResponseEntity.noContent().build(); // ko tìm thấy image trả về nocontent
-        }
     }
 
     @ApiOperation(value = "Api thay đổi avatar User")
