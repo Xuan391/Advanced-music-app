@@ -1,6 +1,7 @@
 package example.Advanced.Music.app.entities;
 
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import example.Advanced.Music.app.constans.Constants;
 import jakarta.persistence.*;
@@ -26,9 +27,7 @@ public class Song extends EntityBase{
     private static final long serialVersionUID = 1L;
 
     @NotNull
-    @Size(max = Constants.NAME_MAX_LENGTH, min = Constants.NAME_MIN_LENGTH)
-    @Pattern(regexp = Constants.PATTERN_NAME)
-    @Column(name = "song_name", length = Constants.NAME_MAX_LENGTH)
+    @Column(name = "song_name")
     private String name;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -48,6 +47,7 @@ public class Song extends EntityBase{
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     @JoinColumn(name = "creator_id")
+    @JsonIgnore
     @JsonIdentityReference(alwaysAsId = true)
     private User creator;
 

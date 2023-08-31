@@ -1,9 +1,15 @@
 package example.Advanced.Music.app.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
-
+@Data
+@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 public class PageResponse<T> extends BaseResponse {
 	private Page<T> page;
 

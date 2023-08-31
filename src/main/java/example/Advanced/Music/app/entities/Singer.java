@@ -22,8 +22,7 @@ import javax.validation.constraints.Size;
 public class Singer extends EntityBase{
     private static final long serialVersionUID = 1L;
     @NotNull
-    @Size(max = Constants.NAME_MAX_LENGTH, min = Constants.NAME_MIN_LENGTH)
-    @Pattern(regexp = Constants.PATTERN_NAME)
+    @Size(max = Constants.NAME_MAX_LENGTH, min = 1)
     @Column(name = "singer_name")
     private String name;
 }

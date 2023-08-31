@@ -55,6 +55,8 @@ public class SongServiceImpl implements SongService{
         for(Song song: page){
             SongDto songDto = new SongDto();
             PropertyUtils.copyProperties(songDto,song);
+            songDto.setCreatorId(song.getCreator().getId());
+            songDto.setNameCreator(song.getCreator().getUsername());
             list.add(songDto);
         }
         long totalElements = page.getTotalElements();
@@ -70,6 +72,8 @@ public class SongServiceImpl implements SongService{
         Song song = optionalSong.get();
         SongDto songDto = new SongDto();
         PropertyUtils.copyProperties(songDto,song);
+        songDto.setCreatorId(song.getCreator().getId());
+        songDto.setNameCreator(song.getCreator().getUsername());
         return songDto;
     }
 
@@ -83,6 +87,8 @@ public class SongServiceImpl implements SongService{
         for (Song song: songs){
             SongDto songDto = new SongDto();
             PropertyUtils.copyProperties(songDto, song);
+            songDto.setCreatorId(song.getCreator().getId());
+            songDto.setNameCreator(song.getCreator().getUsername());
             songDtos.add(songDto);
         }
         if(!Validator.isHaveDataLs(songDtos)){
@@ -141,7 +147,9 @@ public class SongServiceImpl implements SongService{
         songRepository.save(song);
         SongDto songDto = new SongDto();
         PropertyUtils.copyProperties(songDto,song);
-        return songDto; // chưa có controller cho service này
+        songDto.setCreatorId(song.getCreator().getId());
+        songDto.setNameCreator(song.getCreator().getUsername());
+        return songDto;
     }
 
     @Override

@@ -70,7 +70,7 @@ public class ImageStorageService implements IStorageService {
             try(InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, destinationFilePath, StandardCopyOption.REPLACE_EXISTING);
             } // copy file upload vào destinationFilePath // REPLACE_EXISTING nếu tồn tại thì ghi đè
-            return generatedFilename;
+            return generatedFileName2;
         }
         catch (IOException exception) {
             throw new RuntimeException("Failed to store file.",exception);

@@ -73,23 +73,23 @@ public class SongStorageService implements IStorageService {
                 Files.copy(inputStream, destinationFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
 
-            uploadProgressEmitter = new SseEmitter();
-            long fileSize = file.getSize();
-            long uploadedBytes = 0;
-
-            try (InputStream inputStream = file.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = inputStream.read(buffer)) != -1) {
-                    // Lưu trữ file
-                    uploadedBytes += bytesRead;
-                    double progress = (double) uploadedBytes / fileSize * 100;
-                    UploadProgress uploadProgress = new UploadProgress(uploadedBytes,fileSize,progress);
-                    uploadProgressEmitter.send(uploadProgress);
-                }
-            }catch (IOException e) {
-                throw new RuntimeException("Failed to send upload progress.", e);
-            }
+//            uploadProgressEmitter = new SseEmitter();
+//            long fileSize = file.getSize();
+//            long uploadedBytes = 0;
+//
+//            try (InputStream inputStream = file.getInputStream()) {
+//                byte[] buffer = new byte[8192];
+//                int bytesRead;
+//                while ((bytesRead = inputStream.read(buffer)) != -1) {
+//                    // Lưu trữ file
+//                    uploadedBytes += bytesRead;
+//                    double progress = (double) uploadedBytes / fileSize * 100;
+//                    UploadProgress uploadProgress = new UploadProgress(uploadedBytes,fileSize,progress);
+//                    uploadProgressEmitter.send(uploadProgress);
+//                }
+//            }catch (IOException e) {
+//                throw new RuntimeException("Failed to send upload progress.", e);
+//            }
 
             return generatedFileName2;
         } catch (Exception exception) {
@@ -129,6 +129,7 @@ public class SongStorageService implements IStorageService {
             throw new RuntimeException("could not read file: "+fileName, exception);
         }
     }
+
 
     @Override
     public void deleteFileByName(String fileName) {
