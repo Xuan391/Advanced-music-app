@@ -98,16 +98,37 @@ public class SongServiceImpl implements SongService{
         }
     }
 
-    @Override
-    public String deleteById(long id) throws Exception {
-        SongDto songDto = findById(id);
-        songRepository.deleteById(id);
-        if (songRepository.findById(id).isPresent()) {
-            throw new ACTException(ErrorEnum.DELETE_FAILUE,
-                    "Delete User Failue: User " + songDto.getName() + " is not deleted yet!");
-        }
-        return "Delete Success: User " + songDto.getName() + " is deleted!";
+//    @Override
+//    public String deleteById(long id) throws Exception {
+//        SongDto songDto = findById(id);
+//        songRepository.deleteById(id);
+//        if (songRepository.findById(id).isPresent()) {
+//            throw new ACTException(ErrorEnum.DELETE_FAILUE,
+//                    "Delete song Failue: song " + songDto.getName() + " is not deleted yet!");
+//        }
+//        return "Delete Success: song " + songDto.getName() + " is deleted!";
+//    }
+@Override
+public String deleteById(long id) throws Exception {
+    SongDto songDto = findById(id);
+
+    Song songToDelete = songRepository.findById(id)
+            .orElseThrow(() -> new ACTException(ErrorEnum.DELETE_FAILUE,
+                    "Delete song Failure: Song not found"));
+
+    // Xóa các liên kết liên quan đến bài hát trong các bảng khác
+    songToDelete.getSingers().clear();  // Xóa liên kết với singers
+    songToDelete.getListenedHistories().clear();  // Xóa liên kết với listenedHistories
+    songToDelete.getPlaylistSongs().clear();  // Xóa liên kết với playlistSongs
+
+    songRepository.delete(songToDelete);
+
+    if (songRepository.findById(id).isPresent()) {
+        throw new ACTException(ErrorEnum.DELETE_FAILUE,
+                "Delete song Failure: song " + songDto.getName() + " is not deleted yet!");
     }
+    return "Delete Success: song " + songDto.getName() + " is deleted!";
+}
 
     @Override
     public SongDto createSong(String nameSong, MultipartFile imageFile, MultipartFile songFile, List<String> nameSingers) throws Exception {

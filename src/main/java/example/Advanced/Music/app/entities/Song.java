@@ -45,7 +45,7 @@ public class Song extends EntityBase{
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
     @JsonIgnore
     @JsonIdentityReference(alwaysAsId = true)

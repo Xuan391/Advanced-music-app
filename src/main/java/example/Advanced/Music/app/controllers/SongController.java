@@ -39,7 +39,6 @@ public class SongController {
                                          @RequestParam(required = false) SortOrderEnum order) throws Exception {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<SongDto> songDtoPage = songService.findAll(pageable);
-//        return new PageResponse<>(songDtoPage);
         return RequestUtil.page(songDtoPage);
     }
 

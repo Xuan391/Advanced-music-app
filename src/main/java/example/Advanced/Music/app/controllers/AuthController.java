@@ -87,7 +87,4 @@ public class AuthController {
     @ResponseBody
     public SuccessResponse<CurrentUserResponseDto> currentUser() {return RequestUtil.ok(authService.currentUserInfo());}
 
-
-
-
 }
