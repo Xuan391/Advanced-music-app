@@ -15,7 +15,9 @@ public interface SongService {
     List<SongDto> findByIds(List<Long> ids) throws Exception;
     String deleteById(long id) throws Exception;
     SongDto createSong(@Valid String nameSong, MultipartFile imageFile, MultipartFile songFile, List<String> nameSingers) throws Exception;
-    SongDto update(long id, @Valid PatchRequest<UpdateSongRequest> request) throws Exception;
+    SongDto update(long id, @Valid UpdateSongRequest request) throws Exception;
     SongDto changeThumbnail(long id, MultipartFile imageFile) throws Exception;
+    SongDto changeLyric(long id, String lyric) throws Exception;
+    SongDto listenedSong(long songId) throws Exception;
 
 }

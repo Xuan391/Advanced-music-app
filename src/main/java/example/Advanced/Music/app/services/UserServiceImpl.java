@@ -9,9 +9,7 @@ import example.Advanced.Music.app.enums.ErrorEnum;
 import example.Advanced.Music.app.enums.RoleEnum;
 import example.Advanced.Music.app.exception.ACTException;
 import example.Advanced.Music.app.models.CustomUserDetails;
-import example.Advanced.Music.app.repositories.RoleRepository;
-import example.Advanced.Music.app.repositories.TokenRepository;
-import example.Advanced.Music.app.repositories.UserRepository;
+import example.Advanced.Music.app.repositories.*;
 import example.Advanced.Music.app.validator.Validator;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,10 @@ public class UserServiceImpl implements UserService{
     private RoleRepository roleRepository;
     @Autowired
     private TokenRepository tokenRepository;
+    @Autowired
+    private SongRepository songRepository;
+    @Autowired
+    private UserDownloadSongRepository userDownloadSongRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -189,6 +191,20 @@ public class UserServiceImpl implements UserService{
         return null;
     }
 
+    private List<Specification<User>> getAdvanceSearchSpecList(@Valid SearchUserRequest sRequest){
+        List<Specification<User>> specList = new ArrayList<>();
+        if(Validator.isHaveDataString(sRequest.getUsername())){
+            specList.add(SearchUtil.like("username", "%" + sRequest.getUsername()+"%"));
+        }
+        if(Validator.isHaveDataString(sRequest.getName())){
+            specList.add(SearchUtil.like("displayName", "%"+ sRequest.getName()+"%"));
+        }
+        if (Validator.isHaveDataString(sRequest.getEmail())) {
+            specList.add(SearchUtil.like("email", "%" + sRequest.getEmail() + "%"));
+        }
+        return specList;
+    }
+
     @Override
     public UserDto changeAvatar(long userId, MultipartFile file) throws Exception {
         Optional<User> optionalUser = userRepository.findById(userId);
@@ -329,19 +345,47 @@ public class UserServiceImpl implements UserService{
         return new PageImpl<>(listenedHistories, pageable, totalElements);
     }
 
+    @Override
+    public String downloadSong (long songId) throws Exception {
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> optionalUser = userRepository.findById(userDetails.getId());
+        if(!optionalUser.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        }
+        Optional<Song> optionalSong = songRepository.findById(songId);
+        if(!optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        }
 
-    private List<Specification<User>> getAdvanceSearchSpecList(@Valid SearchUserRequest sRequest){
-        List<Specification<User>> specList = new ArrayList<>();
-        if(Validator.isHaveDataString(sRequest.getUsername())){
-            specList.add(SearchUtil.like("username", "%" + sRequest.getUsername()+"%"));
+        User user = optionalUser.get();
+        Song song = optionalSong.get();
+
+        UserDownloadSong userDownloadSong = new UserDownloadSong();
+        userDownloadSong.setUserId(user.getId());
+        userDownloadSong.setSongId(song.getId());
+        userDownloadSongRepository.save(userDownloadSong);
+        return "Download song: "+song.getName()+" successfully";
+    }
+
+    @Override
+    public List<SongDto> getDownloadSongs() throws Exception{
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> optionalUser = userRepository.findById(userDetails.getId());
+        if(!optionalUser.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
         }
-        if(Validator.isHaveDataString(sRequest.getName())){
-            specList.add(SearchUtil.like("displayName", "%"+ sRequest.getName()+"%"));
+        User user = optionalUser.get();
+        List<UserDownloadSong> userDownloadSongs = userDownloadSongRepository.findByUserId(user.getId());
+        List<SongDto> songDtos = new ArrayList<>();
+        for(UserDownloadSong userDownloadSong: userDownloadSongs){
+            Song song = userDownloadSong.getSong();
+            SongDto songDto = new SongDto();
+            PropertyUtils.copyProperties(songDto, song);
+            songDto.setCreatorId(song.getCreator().getId());
+            songDto.setNameCreator(song.getCreator().getUsername());
+            songDtos.add(songDto);
         }
-        if (Validator.isHaveDataString(sRequest.getEmail())) {
-            specList.add(SearchUtil.like("email", "%" + sRequest.getEmail() + "%"));
-        }
-        return specList;
+        return songDtos;
     }
 
 }

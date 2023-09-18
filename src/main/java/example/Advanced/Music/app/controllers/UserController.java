@@ -211,5 +211,20 @@ public class UserController {
         return RequestUtil.page(pageData);
     }
 
+    @ApiOperation(value = "Download bài hát")
+    @PostMapping("/download-song/{songId}")
+    @ResponseBody
+    public SuccessResponse<String> downloadSong(@PathVariable long songId) throws Exception{
+        return RequestUtil.ok(userService.downloadSong(songId));
+    }
+
+    @ApiOperation(value = "Api lấy ra danh sách bài hát mà user đã download")
+    @GetMapping("/get-download-songs")
+    @ResponseBody
+    public SuccessResponse<List<SongDto>> getDownloadSongs() throws Exception{
+        return RequestUtil.ok(userService.getDownloadSongs());
+    }
+
+
 
 }

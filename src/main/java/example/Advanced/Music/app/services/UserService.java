@@ -15,25 +15,15 @@ public interface UserService {
     boolean existsByUserName(String UserName);
     User saveOrUpdate(User user);
     Long count();
-
     String unlockUser(String username);
-
     UserDto create(@Valid CreateUserRequest request) throws Exception;
-
     User update(long id, @Valid PatchRequest<UpdateUserRequest> request) throws Exception;
-
     Page<UserDto> findAll(Pageable pageable) throws Exception;
-
     List<User> findByIds(List<Long> ids) throws Exception;
-
     String deleteById(long id) throws Exception;
-
     UserDto findById(long id) throws Exception;
-
     Page<UserDto> advanceSearch(@Valid SearchUserRequest searchRequest, Pageable pageable) throws Exception;
-
     UserDto changeAvatar(long userId, MultipartFile file) throws Exception;
-
     String followUser(long followUserId) throws Exception;
     String unfollowUser(long userUnfollowUserId) throws Exception;
     Page<UserDto> showFollowers(Pageable pageable) throws Exception;
@@ -41,4 +31,7 @@ public interface UserService {
     Page<Song> showSongOfUser(long userId, Pageable pageable) throws Exception;
     Page<SearchHistory> showSearchHistoryOfUser(Pageable pageable) throws Exception;
     Page<ListenedHistory> showListenedHistoryOfUser(Pageable pageable) throws Exception;
+    String downloadSong (long songId) throws Exception;
+    List<SongDto> getDownloadSongs() throws Exception;
+
 }

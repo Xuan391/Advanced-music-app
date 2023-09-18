@@ -14,12 +14,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "listened_history")
 public class ListenedHistory extends EntityBase{
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIdentityReference(alwaysAsId = true)
     private User user;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "songId")
     private Song song;
 }

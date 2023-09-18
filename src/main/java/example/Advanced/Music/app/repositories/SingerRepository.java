@@ -16,4 +16,6 @@ public interface SingerRepository extends JpaRepository<Singer, Long>, JpaSpecif
 
     Optional<Singer> findByName(String name);
 
+    Boolean existsByName (String name);
+
 }

@@ -3,10 +3,7 @@ package example.Advanced.Music.app.controllers;
 import example.Advanced.Music.app.Util.RequestUtil;
 import example.Advanced.Music.app.Util.SearchUtil;
 import example.Advanced.Music.app.constans.Constants;
-import example.Advanced.Music.app.dto.PageResponse;
-import example.Advanced.Music.app.dto.SongDto;
-import example.Advanced.Music.app.dto.SuccessResponse;
-import example.Advanced.Music.app.dto.UserDto;
+import example.Advanced.Music.app.dto.*;
 import example.Advanced.Music.app.enums.SortOrderEnum;
 import example.Advanced.Music.app.services.ImageStorageService;
 import example.Advanced.Music.app.services.SongService;
@@ -19,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -72,5 +70,32 @@ public class SongController {
         return RequestUtil.ok(songService.createSong(nameSong, imageFile, songFile, nameSingers));
     }
 
+    @ApiOperation(value = "Api cập nhật tên bài hát và ca sĩ hát bài hát đó")
+    @PutMapping("/update/{id}")
+    @ResponseBody
+    public SuccessResponse<SongDto> updateSong(@PathVariable long id, @Valid @RequestBody UpdateSongRequest request) throws Exception {
+        return RequestUtil.ok(songService.update(id,request));
+    }
+
+    @ApiOperation(value = "Api thay đổi thumbnail bài hát")
+    @PutMapping("/change-thumbnail/{id}")
+    @ResponseBody
+    public SuccessResponse<SongDto> changeThumbnail(@PathVariable long id, @RequestParam("imageFile") MultipartFile imageFile) throws Exception{
+        return RequestUtil.ok(songService.changeThumbnail(id, imageFile));
+    }
+
+    @ApiOperation(value = "Api cập nhật lyric bài hát")
+    @PutMapping("/change-lyric/{id}")
+    @ResponseBody
+    public SuccessResponse<SongDto> changeLyric(@PathVariable long id, @RequestParam("lyric") String lyric) throws Exception{
+        return RequestUtil.ok(songService.changeLyric(id, lyric));
+    }
+
+    @ApiOperation(value = "Api tăng lươt nghe bài hát khi user nghe nhạc")
+    @PutMapping("/listened-count/{id}")
+    @ResponseBody
+    public SuccessResponse<SongDto> listenedCount(@PathVariable long id) throws Exception{
+        return RequestUtil.ok(songService.listenedSong(id));
+    }
 
 }

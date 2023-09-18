@@ -3,7 +3,6 @@ package example.Advanced.Music.app.entities;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import example.Advanced.Music.app.constans.Constants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,8 +12,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.*;
 
 @Getter
@@ -45,14 +42,14 @@ public class Song extends EntityBase{
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Column(name = "lyric")
+    private String lyric = null;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id")
     @JsonIgnore
     @JsonIdentityReference(alwaysAsId = true)
     private User creator;
-
-    @Column(name = "download_count")
-    private int downloadCount = 0;
 
     @Column(name = "listened_count")
     private int listenedCount = 0;
@@ -63,4 +60,5 @@ public class Song extends EntityBase{
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "song", cascade = CascadeType.REMOVE)
     private Set<PlaylistSong> playlistSongs = new HashSet<>();
+
 }

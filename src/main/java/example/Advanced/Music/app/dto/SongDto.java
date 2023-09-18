@@ -14,8 +14,8 @@ public class SongDto {
     private List<Singer> singers;
     private String songUrl;
     private String thumbnailUrl;
+    private String lyric;
     private long creatorId;
     private String nameCreator;
-    private int downloadCount;
     private int listenedCount;
 }

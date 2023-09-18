@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,8 +40,6 @@ public class SongServiceImpl implements SongService{
     private SongRepository songRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PlaylistRepository playlistRepository;
     @Autowired
     private SingerRepository singerRepository;
     @Autowired
@@ -98,37 +97,27 @@ public class SongServiceImpl implements SongService{
         }
     }
 
-//    @Override
-//    public String deleteById(long id) throws Exception {
-//        SongDto songDto = findById(id);
-//        songRepository.deleteById(id);
-//        if (songRepository.findById(id).isPresent()) {
-//            throw new ACTException(ErrorEnum.DELETE_FAILUE,
-//                    "Delete song Failue: song " + songDto.getName() + " is not deleted yet!");
-//        }
-//        return "Delete Success: song " + songDto.getName() + " is deleted!";
-//    }
-@Override
-public String deleteById(long id) throws Exception {
-    SongDto songDto = findById(id);
+    @Override
+    public String deleteById(long id) throws Exception {
+        SongDto songDto = findById(id);
 
-    Song songToDelete = songRepository.findById(id)
-            .orElseThrow(() -> new ACTException(ErrorEnum.DELETE_FAILUE,
-                    "Delete song Failure: Song not found"));
+        Song songToDelete = songRepository.findById(id)
+                .orElseThrow(() -> new ACTException(ErrorEnum.DELETE_FAILUE,
+                        "Delete song Failure: Song not found"));
 
-    // Xóa các liên kết liên quan đến bài hát trong các bảng khác
-    songToDelete.getSingers().clear();  // Xóa liên kết với singers
-    songToDelete.getListenedHistories().clear();  // Xóa liên kết với listenedHistories
-    songToDelete.getPlaylistSongs().clear();  // Xóa liên kết với playlistSongs
+        // Xóa các liên kết liên quan đến bài hát trong các bảng khác
+        songToDelete.getSingers().clear();  // Xóa liên kết với singers
+        songToDelete.getListenedHistories().clear();  // Xóa liên kết với listenedHistories
+        songToDelete.getPlaylistSongs().clear();  // Xóa liên kết với playlistSongs
 
-    songRepository.delete(songToDelete);
+        songRepository.delete(songToDelete);
 
-    if (songRepository.findById(id).isPresent()) {
-        throw new ACTException(ErrorEnum.DELETE_FAILUE,
-                "Delete song Failure: song " + songDto.getName() + " is not deleted yet!");
+        if (songRepository.findById(id).isPresent()) {
+            throw new ACTException(ErrorEnum.DELETE_FAILUE,
+                    "Delete song Failure: song " + songDto.getName() + " is not deleted yet!");
+        }
+        return "Delete Success: song " + songDto.getName() + " is deleted!";
     }
-    return "Delete Success: song " + songDto.getName() + " is deleted!";
-}
 
     @Override
     public SongDto createSong(String nameSong, MultipartFile imageFile, MultipartFile songFile, List<String> nameSingers) throws Exception {
@@ -174,12 +163,97 @@ public String deleteById(long id) throws Exception {
     }
 
     @Override
-    public SongDto update(long id, PatchRequest<UpdateSongRequest> request) throws Exception {
-        return null;
+    public SongDto update(long id, UpdateSongRequest request) throws Exception {
+        Optional<Song> optionalSong = songRepository.findById(id);
+        if(!optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            try {
+                Song song = optionalSong.get();
+                if (request.getName() != null){
+                    song.setName(request.getName());
+                }
+                if (request.getSingers() != null && request.getSingers().size() > 0){
+                    List<Singer> singers = new ArrayList<>();
+                    for (String singerName : request.getSingers()){
+                        if(!singerRepository.existsByName(singerName)){
+                            Singer singer = new Singer(singerName);
+                            singerRepository.save(singer);
+                            singers.add(singer);
+                        } else {
+                            Optional<Singer> optionalSinger = singerRepository.findByName(singerName);
+                            Singer singer = optionalSinger.get();
+                            singers.add(singer);
+                        }
+                    }
+                    song.setSingers(singers);
+                }
+                Song b = songRepository.save(song);
+                SongDto songDto = new SongDto();
+                PropertyUtils.copyProperties(songDto,song);
+                songDto.setCreatorId(song.getCreator().getId());
+                songDto.setNameCreator(song.getCreator().getUsername());
+                return songDto;
+            }catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e){
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
     public SongDto changeThumbnail(long id, MultipartFile imageFile) throws Exception {
-        return null;
+        Optional<Song> optionalSong = songRepository.findById(id);
+        if(!optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            Song song = optionalSong.get();
+            if(imageFile != null && !imageFile.isEmpty()){
+                String thumbnailFile = imageStorageService.storeFile(imageFile);
+                String thumbnailUrl = MvcUriComponentsBuilder.fromMethodName(ImageFileController.class, "readDetailImageFile", thumbnailFile).build().toUri().toString();
+                song.setThumbnailUrl(thumbnailUrl);
+            } else {
+                song.setThumbnailUrl(null);
+            }
+            Song s = songRepository.save(song);
+            SongDto songDto = new SongDto();
+            PropertyUtils.copyProperties(songDto, s);
+            songDto.setCreatorId(s.getCreator().getId());
+            songDto.setNameCreator(s.getCreator().getUsername());
+            return songDto;
+        }
+    }
+
+    @Override
+    public SongDto changeLyric(long id, String lyric) throws Exception{
+        Optional<Song> optionalSong = songRepository.findById(id);
+        if(!optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            Song song = optionalSong.get();
+            song.setLyric(lyric);
+            Song s = songRepository.save(song);
+            SongDto songDto = new SongDto();
+            PropertyUtils.copyProperties(songDto, s);
+            songDto.setCreatorId(s.getCreator().getId());
+            songDto.setNameCreator(s.getCreator().getUsername());
+            return songDto;
+        }
+    }
+
+    @Override
+    public SongDto listenedSong(long songId) throws Exception {
+        Optional<Song> optionalSong = songRepository.findById(songId);
+        if(!optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            Song song = optionalSong.get();
+            song.setListenedCount(song.getListenedCount()+1);
+            Song s = songRepository.save(song);
+            SongDto songDto = new SongDto();
+            PropertyUtils.copyProperties(songDto, s);
+            songDto.setCreatorId(s.getCreator().getId());
+            songDto.setNameCreator(s.getCreator().getUsername());
+            return songDto;
+        }
     }
 }

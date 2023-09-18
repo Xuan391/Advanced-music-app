@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class UpdateSongRequest {
-    private String nameSong;
-    private List<String> listNameSinger;
+    private String name;
+    private List<String> singers;
 }
