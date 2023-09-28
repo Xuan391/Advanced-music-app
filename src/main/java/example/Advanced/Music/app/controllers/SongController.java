@@ -30,7 +30,6 @@ public class SongController {
     @ApiOperation(value = "API xem tất cả các bài hát")
     @GetMapping("/get-all")
     @ResponseBody
-    @PreAuthorize("hasAnyAuthority('"+Constants.Role.ROLE_ADMIN+"')")
     public PageResponse<SongDto> findAll(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                          @Positive @RequestParam(required = false) Integer size,
                                          @RequestParam(required = false) String sort,
