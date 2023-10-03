@@ -81,13 +81,13 @@ public class UserController {
     @GetMapping("/get-all")
     @ResponseBody
     @PreAuthorize("hasAnyAuthority('"+Constants.Role.ROLE_ADMIN+"')")
-    public PageResponse<UserDto> findAll(@PositiveOrZero @RequestParam(required = false, defaultValue = "0" )Integer page,
+    public SuccessResponse<Page<UserDto>> findAll(@PositiveOrZero @RequestParam(required = false, defaultValue = "0" )Integer page,
                                          @Positive @RequestParam(required = false, defaultValue = "20") Integer size,
                                          @RequestParam(required = false) String sort,
                                          @RequestParam(required = false) SortOrderEnum order) throws Exception{
         Pageable pageable =SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<UserDto> userDtoPage = userService.findAll(pageable);
-        return RequestUtil.page(userDtoPage);
+        return RequestUtil.ok(userDtoPage);
     }
 
     @ApiOperation(value = "API tìm tài khoản theo Id")
@@ -109,13 +109,13 @@ public class UserController {
     @PostMapping("/search")
     @ResponseBody
     @PreAuthorize("hasAnyAuthority('"+Constants.Role.ROLE_ADMIN+"')")
-    public PageResponse<UserDto> advanceSearch(@Valid @RequestBody SearchUserRequest searchRequest,
+    public SuccessResponse<Page<UserDto>> advanceSearch(@Valid @RequestBody SearchUserRequest searchRequest,
                                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                                @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
                                                @RequestParam(required = false) SortOrderEnum order) throws Exception {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<UserDto> pageData = userService.advanceSearch(searchRequest, pageable);
-        return RequestUtil.page(pageData);
+        return RequestUtil.ok(pageData);
     }
 
     @ApiOperation(value = "Api thay đổi avatar User")
@@ -152,63 +152,51 @@ public class UserController {
     @ApiOperation(value = "Api show danh sách followers")
     @GetMapping("/show-followers")
     @ResponseBody
-    public PageResponse<UserDto> showFollowers(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
+    public SuccessResponse<Page<UserDto>> showFollowers(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                               @Positive @RequestParam(required = false) Integer size,
                                               @RequestParam(required = false) String sort,
                                               @RequestParam(required = false) SortOrderEnum order) throws Exception{
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<UserDto> pageData = userService.showFollowers(pageable);
-        return RequestUtil.page(pageData);
-    }
-
-    @ApiOperation(value = "Api show lịch sử tìm kiếm")
-    @GetMapping("/show-search-history")
-    @ResponseBody
-    public PageResponse<SearchHistory> showSearchHistory(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
-                                               @Positive @RequestParam(required = false) Integer size,
-                                               @RequestParam(required = false) String sort,
-                                               @RequestParam(required = false) SortOrderEnum order) throws Exception{
-        Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        Page<SearchHistory> pageData = userService.showSearchHistoryOfUser(pageable);
-        return RequestUtil.page(pageData);
+        return RequestUtil.ok(pageData);
     }
 
     @ApiOperation(value = "Api show lịch sử nghe nhạc")
     @GetMapping("/show-listened-history")
     @ResponseBody
-    public PageResponse<ListenedHistory> showListenedHistory(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
+    public SuccessResponse<Page<SongDto>> showListenedHistory(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                                            @Positive @RequestParam(required = false) Integer size,
                                                            @RequestParam(required = false) String sort,
                                                            @RequestParam(required = false) SortOrderEnum order) throws Exception{
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        Page<ListenedHistory> pageData = userService.showListenedHistoryOfUser(pageable);
-        return RequestUtil.page(pageData);
+        Page<SongDto> pageData = userService.showListenedHistoryOfUser(pageable);
+        return RequestUtil.ok(pageData);
     }
 
     @ApiOperation(value = "Api show playlist bằng userId")
     @GetMapping("/show-playlists/{userId}")
     @ResponseBody
-    public PageResponse<Playlist> showPlaylist(@PathVariable long userId,
+    public SuccessResponse<Page<Playlist>> showPlaylist(@PathVariable long userId,
                                                @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                                @Positive @RequestParam(required = false) Integer size,
                                                @RequestParam(required = false) String sort,
                                                @RequestParam(required = false) SortOrderEnum order) throws Exception{
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<Playlist> pageData = userService.showPlaylistOfUser(userId,pageable);
-        return RequestUtil.page(pageData);
+        return RequestUtil.ok(pageData);
     }
 
     @ApiOperation(value = "Api show song bằng userId")
     @GetMapping("/show-songs/{userId}")
     @ResponseBody
-    public PageResponse<Song> showSongs(@PathVariable long userId,
+    public SuccessResponse<Page<Song>> showSongs(@PathVariable long userId,
                                            @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                            @Positive @RequestParam(required = false) Integer size,
                                            @RequestParam(required = false) String sort,
                                            @RequestParam(required = false) SortOrderEnum order) throws Exception{
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<Song> pageData = userService.showSongOfUser(userId,pageable);
-        return RequestUtil.page(pageData);
+        return RequestUtil.ok(pageData);
     }
 
     @ApiOperation(value = "Download bài hát")

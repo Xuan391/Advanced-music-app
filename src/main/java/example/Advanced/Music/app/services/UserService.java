@@ -30,7 +30,7 @@ public interface UserService {
     Page<Playlist> showPlaylistOfUser(long userId,Pageable pageable) throws Exception;
     Page<Song> showSongOfUser(long userId, Pageable pageable) throws Exception;
     Page<SearchHistory> showSearchHistoryOfUser(Pageable pageable) throws Exception;
-    Page<ListenedHistory> showListenedHistoryOfUser(Pageable pageable) throws Exception;
+    Page<SongDto> showListenedHistoryOfUser(Pageable pageable) throws Exception;
     String downloadSong (long songId) throws Exception;
     List<SongDto> getDownloadSongs() throws Exception;
 

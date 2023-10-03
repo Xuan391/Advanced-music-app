@@ -24,7 +24,6 @@ import java.util.Set;
 @Entity
 @Table(name = "playlists")
 public class Playlist extends EntityBase {
-    private static final long serialVersionUID = 1L;
 
     @NotNull
     @Size(max = Constants.NAME_MAX_LENGTH, min = Constants.NAME_MIN_LENGTH)

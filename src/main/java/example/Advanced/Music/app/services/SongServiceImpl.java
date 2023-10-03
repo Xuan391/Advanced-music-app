@@ -2,23 +2,14 @@ package example.Advanced.Music.app.services;
 
 import example.Advanced.Music.app.controllers.ImageFileController;
 import example.Advanced.Music.app.controllers.SongFileController;
-import example.Advanced.Music.app.dto.PatchRequest;
 import example.Advanced.Music.app.dto.SongDto;
 import example.Advanced.Music.app.dto.UpdateSongRequest;
-import example.Advanced.Music.app.dto.UserDto;
-import example.Advanced.Music.app.entities.Playlist;
-import example.Advanced.Music.app.entities.Singer;
-import example.Advanced.Music.app.entities.Song;
-import example.Advanced.Music.app.entities.User;
+import example.Advanced.Music.app.entities.*;
 import example.Advanced.Music.app.enums.ErrorEnum;
 import example.Advanced.Music.app.exception.ACTException;
 import example.Advanced.Music.app.models.CustomUserDetails;
-import example.Advanced.Music.app.repositories.PlaylistRepository;
-import example.Advanced.Music.app.repositories.SingerRepository;
-import example.Advanced.Music.app.repositories.SongRepository;
-import example.Advanced.Music.app.repositories.UserRepository;
+import example.Advanced.Music.app.repositories.*;
 import example.Advanced.Music.app.validator.Validator;
-import nonapi.io.github.classgraph.utils.VersionFinder;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +38,8 @@ public class SongServiceImpl implements SongService{
     private ImageStorageService imageStorageService;
     @Autowired
     private SongStorageService songStorageService;
+    @Autowired
+    private ListenedHistoryRepository listenedHistoryRepository;
 
     @Override
     public Page<SongDto> findAll(Pageable pageable) throws Exception {
@@ -146,8 +140,8 @@ public class SongServiceImpl implements SongService{
             if(!optionalSinger.isPresent()){
                 Singer singer = new Singer();
                 singer.setName(nameSinger);
-                singerRepository.save(singer);
-                singers.add(singer);
+                Singer s = singerRepository.save(singer);
+                singers.add(s);
             } else {
                 Singer singer = optionalSinger.get();
                 singers.add(singer);
@@ -177,8 +171,10 @@ public class SongServiceImpl implements SongService{
                     List<Singer> singers = new ArrayList<>();
                     for (String singerName : request.getSingers()){
                         if(!singerRepository.existsByName(singerName)){
-                            Singer singer = new Singer(singerName);
+                            Singer singer = new Singer();
+                            singer.setName(singerName);
                             singerRepository.save(singer);
+                            singerRepository.flush();
                             singers.add(singer);
                         } else {
                             Optional<Singer> optionalSinger = singerRepository.findByName(singerName);
@@ -242,18 +238,27 @@ public class SongServiceImpl implements SongService{
 
     @Override
     public SongDto listenedSong(long songId) throws Exception {
-        Optional<Song> optionalSong = songRepository.findById(songId);
-        if(!optionalSong.isPresent()){
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<User> optionalUser = userRepository.findById(userDetails.getId());
+        if (!optionalUser.isPresent()) {
             throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
-        } else {
-            Song song = optionalSong.get();
-            song.setListenedCount(song.getListenedCount()+1);
-            Song s = songRepository.save(song);
-            SongDto songDto = new SongDto();
-            PropertyUtils.copyProperties(songDto, s);
-            songDto.setCreatorId(s.getCreator().getId());
-            songDto.setNameCreator(s.getCreator().getUsername());
-            return songDto;
         }
+        Optional<Song> optionalSong = songRepository.findById(songId);
+        if (!optionalSong.isPresent()) {
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        }
+        User user = optionalUser.get();
+        Song song = optionalSong.get();
+        ListenedHistory listenedHistory = new ListenedHistory(user, song);
+        listenedHistoryRepository.save(listenedHistory);
+
+        song.setListenedCount(song.getListenedCount() + 1);
+        Song s = songRepository.save(song);
+        SongDto songDto = new SongDto();
+        PropertyUtils.copyProperties(songDto, s);
+        songDto.setCreatorId(s.getCreator().getId());
+        songDto.setNameCreator(s.getCreator().getUsername());
+        return songDto;
+
     }
 }

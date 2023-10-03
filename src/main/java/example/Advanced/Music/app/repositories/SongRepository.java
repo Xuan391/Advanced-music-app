@@ -5,6 +5,8 @@ import example.Advanced.Music.app.entities.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,4 +16,6 @@ import java.util.List;
 public interface SongRepository extends JpaRepository<Song, Long>, JpaSpecificationExecutor<Song> {
     Song findByName(String nameSong);
     List<Song> findByIdIn(List<Long> ids);
+    @Query(value = "SELECT * FROM Song WHERE name LIKE %:searchText%", nativeQuery = true)
+    List<Song> searchSongsByName(@Param("searchText") String searchText);
 }

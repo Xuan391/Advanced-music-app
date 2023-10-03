@@ -43,6 +43,8 @@ public class UserServiceImpl implements UserService{
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ImageStorageService imageStorageService;
+    @Autowired
+    private ListenedHistoryRepository listenedHistoryRepository;
     @Override
     public Optional<User> findByUserName(String userName) {
         return userRepository.findByUsername(userName);
@@ -332,17 +334,27 @@ public class UserServiceImpl implements UserService{
         return new PageImpl<>(searchHistories, pageable, totalElements);
     }
 
+
+
     @Override
-    public Page<ListenedHistory> showListenedHistoryOfUser(Pageable pageable) throws Exception {
+    public Page<SongDto> showListenedHistoryOfUser(Pageable pageable) throws Exception {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<User> optionalUser = userRepository.findById(userDetails.getId());
         if(!optionalUser.isPresent()){
             throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
         }
         User user = optionalUser.get();
-        List<ListenedHistory> listenedHistories = user.getListenedHistories();
-        long totalElements = listenedHistories.size();
-        return new PageImpl<>(listenedHistories, pageable, totalElements);
+        List<Song> songs = listenedHistoryRepository.findByUserOrderByCreatedDateDesc(user);
+        List<SongDto> songDtos = new ArrayList<>();
+        for(Song song: songs){
+            SongDto songDto = new SongDto();
+            PropertyUtils.copyProperties(songDto,song);
+            songDto.setCreatorId(song.getCreator().getId());
+            songDto.setNameCreator(song.getCreator().getUsername());
+            songDtos.add(songDto);
+        }
+        long totalElements = songDtos.size();
+        return new PageImpl<>(songDtos, pageable, totalElements);
     }
 
     @Override

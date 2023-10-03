@@ -45,4 +45,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Modifying
     @Query("update User u set u.password = :pwd where u.id = :id")
     int updatePassword(@Param("pwd") String pwd, @Param("id") long id);
+
+    @Query(value = "SELECT * FROM  User WHERE username LIKE %:searchText%", nativeQuery = true)
+    List<User> searchUsersByName(@Param("searchText") String searchText);
 }

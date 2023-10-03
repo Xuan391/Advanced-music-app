@@ -30,13 +30,13 @@ public class SongController {
     @ApiOperation(value = "API xem tất cả các bài hát")
     @GetMapping("/get-all")
     @ResponseBody
-    public PageResponse<SongDto> findAll(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
+    public SuccessResponse<Page<SongDto>> findAll(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
                                          @Positive @RequestParam(required = false) Integer size,
                                          @RequestParam(required = false) String sort,
                                          @RequestParam(required = false) SortOrderEnum order) throws Exception {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
         Page<SongDto> songDtoPage = songService.findAll(pageable);
-        return RequestUtil.page(songDtoPage);
+        return RequestUtil.ok(songDtoPage);
     }
 
     @ApiOperation(value = "API tìm bài hát theo id")

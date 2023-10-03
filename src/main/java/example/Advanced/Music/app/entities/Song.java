@@ -30,10 +30,10 @@ public class Song extends EntityBase{
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "singer_song",
-            joinColumns = {@JoinColumn(name = "singer_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "song_id", referencedColumnName = "id")})
-    @OnDelete(action = OnDeleteAction.CASCADE)
+            joinColumns = {@JoinColumn(name = "song_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "singer_id", referencedColumnName = "id")})
     private List<Singer> singers = new ArrayList<>();
+
 
     @NotNull
     @Column(name = "song_data_url", nullable = false, unique = true)

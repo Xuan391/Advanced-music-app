@@ -10,6 +10,7 @@ import example.Advanced.Music.app.enums.ErrorEnum;
 import example.Advanced.Music.app.exception.ACTException;
 import example.Advanced.Music.app.models.CustomUserDetails;
 import example.Advanced.Music.app.repositories.PlaylistRepository;
+import example.Advanced.Music.app.repositories.SongRepository;
 import example.Advanced.Music.app.repositories.UserRepository;
 import example.Advanced.Music.app.validator.Validator;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -17,17 +18,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class PlaylistServiceImpl implements PlaylistService {
     @Autowired
     private PlaylistRepository playlistRepository;
+    @Autowired
+    private SongRepository songRepository;
     @Autowired
     private UserRepository userRepository;
 
@@ -112,11 +118,16 @@ public class PlaylistServiceImpl implements PlaylistService {
         PlaylistDto playlistDto = findById(id);
         if(!playlistDto.isFavorite()) {
             Playlist playlistToDelete = playlistRepository.findById(id).orElseThrow(() -> new ACTException(ErrorEnum.DELETE_FAILUE, "Delete playlist failure: Playlist not found"));
-            playlistRepository.delete(playlistToDelete);
+            try {
+                playlistToDelete.getSongs().clear();
+                playlistRepository.delete(playlistToDelete);
+            } catch (Exception e){
+                throw new Exception("delete false");
+            }
             if (playlistRepository.findById(id).isPresent()) {
                 throw new ACTException(ErrorEnum.DELETE_FAILUE, "Delete playlist failfure: playlist " + playlistDto.getName() + " is not delete yet");
             }
-            return "Delete success: playlist " + playlistDto.getName() + "is deleted";
+            return "Delete success: playlist " + playlistDto.getName() + " is deleted";
         } else {
             throw new ACTException(ErrorEnum.DELETE_FAILUE, "You can not delete this playlist because It is favorite playlist of user  ");
         }
@@ -151,19 +162,40 @@ public class PlaylistServiceImpl implements PlaylistService {
         }
         Playlist playlist = optionalPlaylist.get();
         playlist.setName(newName);
+        Playlist p = playlistRepository.save(playlist);
         ListPlayListDto listPlayListDto = new ListPlayListDto();
-        PropertyUtils.copyProperties(listPlayListDto, playlist);
-        listPlayListDto.setCreatorId(playlist.getCreator().getId());
+        PropertyUtils.copyProperties(listPlayListDto, p);
+        listPlayListDto.setCreatorId(p.getCreator().getId());
         return listPlayListDto;
     }
 
     @Override
     public String addSongToPlaylist(long playlistId, long songId) throws Exception {
-        return null;
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+        Optional<Song> optionalSong = songRepository.findById(songId);
+        if(!optionalPlaylist.isPresent() || !optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            Playlist playlist = optionalPlaylist.get();
+            Song song = optionalSong.get();
+            playlist.getSongs().add(song);
+            playlistRepository.save(playlist);
+            return "Added song to playlist successfully";
+        }
     }
 
     @Override
     public String deleteSongFromPlaylist(long playlistId, long songId) throws Exception {
-        return null;
+        Optional<Playlist> optionalPlaylist = playlistRepository.findById(playlistId);
+        Optional<Song> optionalSong = songRepository.findById(songId);
+        if(!optionalPlaylist.isPresent() || !optionalSong.isPresent()){
+            throw new ACTException(ErrorEnum.NOT_FOUND, ErrorEnum.NOT_FOUND.getMessageId());
+        } else {
+            Playlist playlist = optionalPlaylist.get();
+            Song song = optionalSong.get();
+            playlist.getSongs().remove(song);
+            playlistRepository.save(playlist);
+            return "Successfully deleted song from playlist";
+        }
     }
 }
