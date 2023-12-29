@@ -34,7 +34,6 @@ public class Song extends EntityBase{
             inverseJoinColumns = {@JoinColumn(name = "singer_id", referencedColumnName = "id")})
     private List<Singer> singers = new ArrayList<>();
 
-
     @NotNull
     @Column(name = "song_data_url", nullable = false, unique = true)
     private String songUrl;

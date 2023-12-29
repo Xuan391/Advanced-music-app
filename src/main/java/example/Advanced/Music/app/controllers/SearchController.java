@@ -1,6 +1,5 @@
 package example.Advanced.Music.app.controllers;
 
-import com.act.test.security.validator.FieldExists;
 import example.Advanced.Music.app.Util.RequestUtil;
 import example.Advanced.Music.app.dto.SearchDto;
 import example.Advanced.Music.app.dto.SearchResultDto;

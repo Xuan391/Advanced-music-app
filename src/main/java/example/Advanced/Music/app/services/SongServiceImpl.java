@@ -1,7 +1,5 @@
 package example.Advanced.Music.app.services;
 
-import example.Advanced.Music.app.controllers.ImageFileController;
-import example.Advanced.Music.app.controllers.SongFileController;
 import example.Advanced.Music.app.dto.SongDto;
 import example.Advanced.Music.app.dto.UpdateSongRequest;
 import example.Advanced.Music.app.entities.*;
@@ -18,11 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -124,15 +120,15 @@ public class SongServiceImpl implements SongService{
         Song song = new Song();
         song.setCreator(user);
         song.setName(nameSong);
-        if(imageFile == null){
+        if(imageFile == null || imageFile.isEmpty()){
             song.setThumbnailUrl(null);
         }else {
             String thumbnailFile = imageStorageService.storeFile(imageFile);
-            String thumbnailUrl = MvcUriComponentsBuilder.fromMethodName(ImageFileController.class, "readDetailImageFile", thumbnailFile).build().toUri().toString();
+            String thumbnailUrl = "api/Songs/imageFiles/" + thumbnailFile;
             song.setThumbnailUrl(thumbnailUrl);
         }
         String songFileName = songStorageService.storeFile(songFile);
-        String songUrl = MvcUriComponentsBuilder.fromMethodName(SongFileController.class,"readDetailSongFile", songFileName).build().toUri().toString();
+        String songUrl = "/api/v1/music/musicFiles/" + songFileName;
         song.setSongUrl(songUrl);
         List<Singer> singers = new ArrayList<>();
         for(String nameSinger : nameSingers){
@@ -205,7 +201,7 @@ public class SongServiceImpl implements SongService{
             Song song = optionalSong.get();
             if(imageFile != null && !imageFile.isEmpty()){
                 String thumbnailFile = imageStorageService.storeFile(imageFile);
-                String thumbnailUrl = MvcUriComponentsBuilder.fromMethodName(ImageFileController.class, "readDetailImageFile", thumbnailFile).build().toUri().toString();
+                String thumbnailUrl = "api/Songs/imageFiles/" + thumbnailFile;
                 song.setThumbnailUrl(thumbnailUrl);
             } else {
                 song.setThumbnailUrl(null);

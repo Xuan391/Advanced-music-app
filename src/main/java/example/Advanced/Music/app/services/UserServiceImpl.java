@@ -216,8 +216,7 @@ public class UserServiceImpl implements UserService{
         User user = optionalUser.get();
         if(file != null && !file.isEmpty()){
             String imageFile = imageStorageService.storeFile(file);
-            String avatarUrl = MvcUriComponentsBuilder.fromMethodName(ImageFileController.class, "readDetailImageFile",
-                    imageFile).build().toUri().toString();
+            String avatarUrl = "api/Songs/imageFiles"+ imageFile;
             user.setAvatarUrl(avatarUrl);
         } else {
             user.setAvatarUrl(null);
