@@ -9,9 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>example</groupId>
-	<artifactId>Advanced-Music-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Advanced-Music-app</name>
+	<artifactId>music_app</artifactId>
+	<version>-SNAPSHOT</version>
 	<description>Back end project for ListenMusicApp</description>
 	<properties>
 		<java.version>17</java.version>
