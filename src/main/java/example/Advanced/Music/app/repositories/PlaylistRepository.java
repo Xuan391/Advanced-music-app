@@ -12,6 +12,6 @@ import java.util.List;
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Long>, JpaSpecificationExecutor<Playlist> {
     List<Playlist> findByIdIn(List<Long> ids);
-    @Query(value = "SELECT * FROM  Playlist WHERE name LIKE %:searchText%", nativeQuery = true)
+    @Query(value = "SELECT p FROM  Playlist p WHERE p.name LIKE %:searchText%")
     List<Playlist> searchPlaylistByName(@Param("searchText") String searchText);
 }

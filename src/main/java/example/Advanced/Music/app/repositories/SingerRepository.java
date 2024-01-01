@@ -21,7 +21,7 @@ public interface SingerRepository extends JpaRepository<Singer, Long>, JpaSpecif
 
     Boolean existsByName (String name);
     List<Singer> findByIdIn (List<Long> ids);
-    @Query(value = "SELECT * FROM  Singer WHERE name LIKE %:searchText%", nativeQuery = true)
+    @Query(value = "SELECT si FROM  Singer si WHERE si.name LIKE %:searchText%")
     List<Singer> searchSingerByByName(@Param("searchText") String searchText);
 
 }

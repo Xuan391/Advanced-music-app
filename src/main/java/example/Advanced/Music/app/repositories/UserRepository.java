@@ -46,6 +46,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("update User u set u.password = :pwd where u.id = :id")
     int updatePassword(@Param("pwd") String pwd, @Param("id") long id);
 
-    @Query(value = "SELECT User FROM  User WHERE username LIKE concat('%', ?1, '%') ")
+    @Query(value = "SELECT u FROM  User u WHERE u.username LIKE concat('%', ?1, '%') ")
     List<User> searchUsersByName(@Param("searchText") String searchText);
 }

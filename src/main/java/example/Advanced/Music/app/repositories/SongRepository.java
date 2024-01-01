@@ -16,6 +16,6 @@ import java.util.List;
 public interface SongRepository extends JpaRepository<Song, Long>, JpaSpecificationExecutor<Song> {
     Song findByName(String nameSong);
     List<Song> findByIdIn(List<Long> ids);
-    @Query(value = "SELECT * FROM Song WHERE name LIKE %:searchText%", nativeQuery = true)
+    @Query(value = "SELECT s FROM Song s WHERE s.name LIKE %:searchText%")
     List<Song> searchSongsByName(@Param("searchText") String searchText);
 }
