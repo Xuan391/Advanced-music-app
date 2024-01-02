@@ -1,6 +1,7 @@
 package example.Advanced.Music.app.config;
 
 import example.Advanced.Music.app.config.handler.AuthEntryPointJwt;
+import example.Advanced.Music.app.constans.Constants;
 import example.Advanced.Music.app.jwt.JwtAuthFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +80,10 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .requestMatchers("/swagger-ui/index.html", "/swagger-resources/**", "/v2/api-docs").permitAll();
         http.authorizeRequests().requestMatchers(String.valueOf(PathRequest.toStaticResources().atCommonLocations())).permitAll();
-        http.authorizeRequests().requestMatchers("/api/v1/users/login").permitAll().anyRequest().authenticated();
+        http.authorizeRequests().requestMatchers("/api/v1/users/login").permitAll()
+                .requestMatchers("/api/v1/users/**").hasAnyAuthority(Constants.Role.ROLE_ADMIN, Constants.Role.ROLE_USER)
+                .requestMatchers("/api/v1/song/**").hasAnyAuthority(Constants.Role.ROLE_USER, Constants.Role.ROLE_ADMIN)
+                .anyRequest().authenticated();
         http.authorizeRequests().and().logout().logoutUrl("/api/v1/users/logout")
                 .logoutSuccessHandler(logoutSuccessHandler);
         http.authorizeRequests().and().addFilterBefore(jwtAuthenticationFilter,
