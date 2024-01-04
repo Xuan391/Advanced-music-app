@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService{
         User user = optionalUser.get();
         if(file != null && !file.isEmpty()){
             String imageFile = imageStorageService.storeFile(file);
-            String avatarUrl = "api/Songs/imageFiles"+ imageFile;
+            String avatarUrl = "/api/v1/imageFiles"+ imageFile;
             user.setAvatarUrl(avatarUrl);
         } else {
             user.setAvatarUrl(null);

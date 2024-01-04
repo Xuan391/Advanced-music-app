@@ -124,7 +124,7 @@ public class SongServiceImpl implements SongService{
             song.setThumbnailUrl(null);
         }else {
             String thumbnailFile = imageStorageService.storeFile(imageFile);
-            String thumbnailUrl = "api/Songs/imageFiles/" + thumbnailFile;
+            String thumbnailUrl = "/api/v1/imageFiles/" + thumbnailFile;
             song.setThumbnailUrl(thumbnailUrl);
         }
         String songFileName = songStorageService.storeFile(songFile);
@@ -201,7 +201,7 @@ public class SongServiceImpl implements SongService{
             Song song = optionalSong.get();
             if(imageFile != null && !imageFile.isEmpty()){
                 String thumbnailFile = imageStorageService.storeFile(imageFile);
-                String thumbnailUrl = "api/Songs/imageFiles/" + thumbnailFile;
+                String thumbnailUrl = "/api/v1/imageFiles/" + thumbnailFile;
                 song.setThumbnailUrl(thumbnailUrl);
             } else {
                 song.setThumbnailUrl(null);

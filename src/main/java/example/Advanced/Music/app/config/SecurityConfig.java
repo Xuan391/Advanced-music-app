@@ -12,11 +12,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -75,19 +77,20 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.csrf().disable();
         http.exceptionHandling().authenticationEntryPoint(unAuthorizedHandler);
-        http.cors().configurationSource(new CorsConfiguration());
-        http.sessionManagement().sessionFixation().newSession().maximumSessions(1).maxSessionsPreventsLogin(true);
+        http.cors(Customizer.withDefaults());
         http.authorizeRequests()
-                .requestMatchers("/swagger-ui/index.html", "/swagger-resources/**", "/v2/api-docs").permitAll();
-        http.authorizeRequests().requestMatchers(String.valueOf(PathRequest.toStaticResources().atCommonLocations())).permitAll();
-        http.authorizeRequests().requestMatchers("/api/v1/users/login").permitAll()
+                .requestMatchers("/swagger-ui/index.html", "/swagger-resources/**", "/v2/api-docs").permitAll()
+                .requestMatchers(String.valueOf(PathRequest.toStaticResources().atCommonLocations())).permitAll()
+                .requestMatchers("/api/v1/users/login").permitAll()
+                .requestMatchers("/api/v1/imageFiles/**").permitAll()
+                .requestMatchers("/api/v1/music/musicFiles/**").permitAll()
                 .requestMatchers("/api/v1/users/**").hasAnyAuthority(Constants.Role.ROLE_ADMIN, Constants.Role.ROLE_USER)
                 .requestMatchers("/api/v1/song/**").hasAnyAuthority(Constants.Role.ROLE_USER, Constants.Role.ROLE_ADMIN)
                 .anyRequest().authenticated();
         http.authorizeRequests().and().logout().logoutUrl("/api/v1/users/logout")
                 .logoutSuccessHandler(logoutSuccessHandler);
-        http.authorizeRequests().and().addFilterBefore(jwtAuthenticationFilter,
-                UsernamePasswordAuthenticationFilter.class);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.userDetailsService(userDetailsService);
         return http.build();
     }
@@ -103,18 +106,6 @@ public class SecurityConfig {
             cors.setAllowedHeaders(Arrays.asList(headerArray));
             return cors;
         }
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/swagger-ui.html")
-                        .allowedOrigins("http://localhost:8083") // Thêm các origin khác nếu cần
-                        .allowedMethods("GET", "POST", "PUT", "DELETE"); // Các phương thức cho phép
-            }
-        };
     }
 
 }
